@@ -44,11 +44,3 @@ Feature: Manage orders
         And I enter expired card details
         When I click Pay By Card
         Then My payment should be not be successful
-        
-
-# Scenario: Add an item to order and verify order total
-
-# Scenario: Delete an item from order and verify order total
-
-
-# Scenario: Delete all items from order and verify order total

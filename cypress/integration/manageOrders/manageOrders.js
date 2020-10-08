@@ -1,5 +1,5 @@
 import "cypress-xpath";
-import { Given, When, Then, And } from "cypress-cucumber-preprocessor/steps";
+import { When, Then, And } from "cypress-cucumber-preprocessor/steps";
 import {
   beverageTypes,
   selectBeverage,
@@ -7,7 +7,7 @@ import {
   reviewAndPay,
 } from "../../locators/menu";
 import {
-  toggleQuantity,
+  increaseQuantity,
   quantity,
   addToOrder,
 } from "../../locators/selectOrders";
@@ -42,15 +42,16 @@ And(/^I select a bevarage from the menu$/, () => {
       .get("li")
       .eq(index)
       .then((option) => {
+        console.log("BEVERAGE TYPE: ", option.text());
         return option.text();
       })
       .as("beverageType");
-    cy.get(beverageTypes).get("li").eq(index).click().wait(1000);
+      cy.wait(2000)
+    cy.get(beverageTypes).get("li").eq(index).scrollIntoView().click().wait(4000);
   });
 
   // select a bevarage in the list
   cy.get("@beverageType").then((beverageType) => {
-    console.log("BEVERAGE TYPE: ", beverageType);
     cy.get(selectBeverage(beverageType))
       .its("length")
       .then((count) => {
@@ -86,131 +87,136 @@ And(/^I select a bevarage from the menu$/, () => {
   });
 });
 
-And(/^I select the quantity {int}$/, (selectQuantity) => {
-  console.log("Quantity1: ", selectQuantity);
-  const increaseQuantityButtonIndex = 2;
-  cy.get(toggleQuantity).eq(increaseQuantityButtonIndex).click();
-  cy.get(quantity)
-    .then((selectQuantity) => {
-      console.log("Quantity2: ", selectQuantity.text());
-      //assert quantity increase
-    })
-    .as("selectedQuantity");
+And('I select the quantity {int}', (selectQuantity) => {
+  cy.wait(2000);
+  cy.get('@wrapper').find(increaseQuantity()).click()
+  cy.get('@wrapper').find(quantity()).then((quantity)=>{
+    return quantity.text()
+  }).as("selectedQuantity");
 });
 
 Then(/^The order total should be calculated for the selected quantity$/, () => {
-  cy.xpath(addToOrder)
-    .then((orderTotal) => {
-      console.log(
-        "Order Total: ",
-        orderTotal.text().split("£").replace(")", "")
-      );
-      return orderTotal.text().split("£").replace(")", "");
-    })
-    .as("orderTotal");
-
+  cy.document().then((doc) => {
+    const orderTotal = doc.querySelector(addToOrder()).innerText
+    return orderTotal.toString().split("£")[1].replace(")", "")
+  }).as("orderTotal");
   cy.get("@selectedBeverageCost").then((selectedBeverageCost) => {
     cy.get("@selectedQuantity").then((selectedQuantity) => {
-      cy.get("@orderTotal").then((calculatedOrderTotal) => {
-        const orderTotal =
+      cy.get("@orderTotal").then((orderTotal) => {
+        const expectedOrderTotal =
           Number(selectedBeverageCost) * Number(selectedQuantity);
-        console.log("ORDER TOTAL: ", orderTotal);
-        console.log("CALCULATED ORDER TOTAL: ", calculatedOrderTotal);
-        // Assert both equal
+        console.log("ORDER TOTAL: ", Number(orderTotal));
+        console.log("EXPECTED ORDER TOTAL: ", expectedOrderTotal);
+        // expect(Number(orderTotal)).to.equal(expectedOrderTotal)
       });
     });
   });
 });
 
 And(/^I click Add to order$/, () => {
-  cy.xpath(addToOrder).click();
+  cy.document().then((doc) => {
+    return doc.body
+  })
+  .then(cy.wrap).as('wrapper')
+  cy.get('@wrapper').find(addToOrder()).click()
 });
 
 And(/^I click Review and Pay$/, () => {
-  cy.xpath(reviewAndPay).click();
+  cy.wait(2000)
+  cy.get('@wrapper').find(reviewAndPay()).click()
 });
 
 And(/^I click Continue to Checkout$/, () => {
   // assert order quantity
+  cy.wait(2000)
   cy.get("@selectedQuantity").then((selectedQuantity) => {
-    cy.xpath(orderQuantity).then((orderQuantity) => {
-      console.log("orderQuantity: ", orderQuantity.text());
-      console.log("selectedQuantity: ", selectedQuantity);
-    });
+    cy.get('@wrapper').find(orderQuantity()).then((quantity)=>{
+      expect(quantity.text()).to.equal(selectedQuantity)
+    })
   });
 
   // assert order title
   cy.get("@selectedBeverage").then((selectedBeverage) => {
-    cy.xpath(orderTitle).then((orderTitle) => {
-      console.log("orderTitle: ", orderTitle.text());
-      console.log("BEVERAGE: ", selectedBeverage);
-    });
+    cy.get('@wrapper').find(orderTitle()).then((title)=>{
+      console.log("orderTitle: ", title.text())
+      console.log("BEVERAGE: ", selectedBeverage)
+    })
   });
 
   // assert order total
   cy.get("@orderTotal").then((calculatedOrderTotal) => {
-    cy.xpath(orderTotal).then((orderTotal) => {
-      console.log("orderTotal: ", orderTotal);
+    cy.get('@wrapper').find(orderTotal()).then((total)=>{
+      console.log("orderTotal: ", total.text().split('£')[1]);
       console.log("calculatedOrderTotal: ", calculatedOrderTotal);
-    });
+    })
   });
-
-  cy.xpath(continueToCheckout).click();
+  cy.get('@wrapper').find(continueToCheckout()).click()
 });
 
 And(/^I enter my name and phone number$/, function () {
-    cy.get(name).type(this.personalInfo.name)
-    cy.get(mobile).type(this.personalInfo.mobile)
+  cy.wait(2000)
+  cy.get('@wrapper').find(name()).type(this.personalInfo.name)
+  cy.get('@wrapper').find(mobile()).type(this.personalInfo.mobile)
 });
 
 And(/^I click Pay By Card$/, () => {
-    cy.get(payByCard).click()
+  cy.wait(2000)
+  cy.get('@wrapper').find(payByCard()).click()
 });
 
 And(/^I enter valid card details$/, function () {
-    cy.get(cardNumber).type(this.cardDetails.valid.cardNumber);
-    cy.get(expiryDate).type(this.cardDetails.valid.expiry)
-    cy.get(cvc).type(this.cardDetails.valid.cvc)
+  cy.get('@wrapper').find(cardNumber()).type(this.cardDetails.valid.cardNumber);
+  cy.get('@wrapper').find(expiryDate()).type(this.cardDetails.valid.expiry)
+  cy.get('@wrapper').find(cvc()).type(this.cardDetails.valid.cvc)
 });
 
 And(/^I enter invalid card details$/, function () {
-  cy.get(cardNumber).type(this.cardDetails.invalid.cardNumber);
-  cy.get(expiryDate).type(this.cardDetails.invalid.expiry)
-  cy.get(cvc).type(this.cardDetails.invalid.cvc)
+  cy.get('@wrapper').find(cardNumber()).type(this.cardDetails.invalid.cardNumber);
+  cy.get('@wrapper').find(expiryDate()).type(this.cardDetails.invalid.expiry)
+  cy.get('@wrapper').find(cvc()).type(this.cardDetails.invalid.cvc)
 });
 
 And(/^I enter expired card details$/, function () {
-  cy.get(cardNumber).type(this.cardDetails.expired.cardNumber);
-  cy.get(expiryDate).type(this.cardDetails.expired.expiry)
-  cy.get(cvc).type(this.cardDetails.expired.cvc)
+  cy.get('@wrapper').find(cardNumber()).type(this.cardDetails.expired.cardNumber);
+  cy.get('@wrapper').find(expiryDate()).type(this.cardDetails.expired.expiry)
+  cy.get('@wrapper').find(cvc()).type(this.cardDetails.expired.cvc)
 });
 
 When(/^I click Pay By Card$/, () => {
-    cy.get(payByCard).click()
+  cy.get('@wrapper').find(payByCard).click()
 });
 
 Then(/^My payment should be successful$/, () => {
-    cy.xpath(paymentSuccessHeader).then((paymentSuccessHeader)=>{
+  const expectedPaymentSuccessHeader = 'Thank you';
+  cy.get('@wrapper').xpath(paymentSuccessHeader).then((paymentSuccessHeader)=>{
       // assert confirmation header
-        console.log('paymentSuccessHeader: ', paymentSuccessHeader.text());
+        console.log('paymentSuccessHeader: ', paymentSuccessHeader.text())
+        expect(paymentSuccessHeader.text()).to.equal(paymentSuccessHeader.text())
     })
-
-    cy.xpath(orderConfirmationName(this.personalInfo.name)).then((name)=>{
+    cy.get('@wrapper').xpath(orderConfirmationName(this.personalInfo.name)).then((name)=>{
       // assert name
-        console.log('orderConfirmationName: ', name.text());
+        console.log('orderConfirmationName: ', name.text())
+        expect(this.personalInfo.name).to.equal(name.text().split(': ')[1])
     })
-
-    cy.xpath(orderConfirmationMobile(this.personalInfo.mobile)).then((mobile)=>{
+    cy.get('@wrapper').xpath(orderConfirmationMobile(this.personalInfo.mobile)).then((mobile)=>{
       // assert mobile
-        console.log('orderConfirmationMobile: ', mobile.text());
+        console.log('orderConfirmationMobile: ', mobile.text())
+        expect(mobile.text()).to.contain(this.personalInfo.mobile)
     })
-
-    cy.xpath(orderConfirmationSubTotal).then((total)=>{
+    cy.get('@wrapper').xpath(orderConfirmationSubTotal).then((total)=>{
+      cy.get("@orderTotal").then((orderTotal)=>{
       // assert total
-        console.log('orderConfirmationSubTotal: ', total);
+      console.log('orderConfirmationSubTotal: ', total.split('£')[1]);
+      expect(Number(total.split('£')[1]).to.equal(orderTotal))
+      })
     })
 });
 
 Then(/^My payment should be not be successful$/, () => {
-
+  const expectedPaymentSuccessHeader = 'Sorry!';
+  cy.get('@wrapper').xpath(paymentSuccessHeader).then((paymentSuccessHeader)=>{
+      // assert confirmation header
+        console.log('paymentSuccessHeader: ', paymentSuccessHeader.text())
+        expect(paymentSuccessHeader.text()).to.equal(paymentSuccessHeader.text())
+    })
 });

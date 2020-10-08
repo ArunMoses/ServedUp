@@ -1,5 +1,5 @@
-exports.toggleQuantity = () => {
-    return 'div button img'
+exports.increaseQuantity = () => {
+    return 'button.sc-bkbjAj.dlagLn'
 }
 
 exports.quantity = () => {
@@ -7,5 +7,5 @@ exports.quantity = () => {
 }
 
 exports.addToOrder = () => {
-    return "//button/p[contains(text(),'Add to order')]"
+    return "p.sc-pNWxx.gimreV"
 }

@@ -1,15 +1,15 @@
 exports.orderQuantity = () => {
-    return "//p[text()='Your Order']/following::div//p"
+    return 'p.sc-fnVYJo.chOBr'
 }
 
 exports.orderTitle = () => {
-    return "//p[text()='Your Order']/following::div//p/following::div/p"
+    return 'p.sc-pNWxx.jUYfpE'
 }
 
 exports.orderTotal = () => {
-    return "//p[text()='Total to pay:']/following::p"
+    return 'p.sc-pNWxx.euDrTw'
 }
 
 exports.continueToCheckout = () => {
-    return "//p[text()='Continue to Checkout']"
+    return 'p.sc-pNWxx.gimreV'
 }

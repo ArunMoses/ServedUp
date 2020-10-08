@@ -12,5 +12,5 @@ exports.beverageCost = (beverage) => {
 }
 
 exports.reviewAndPay = () => {
-    return "//button/p[text()='Review & Pay']"
+    return `p.sc-pNWxx.gimreV`
 }

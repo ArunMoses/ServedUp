@@ -7,5 +7,5 @@ exports.mobile = () => {
 }
 
 exports.payByCard = () => {
-    return "button[type='submit']"
+    return 'p.sc-pNWxx.gimreV'
 }
