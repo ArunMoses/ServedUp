@@ -1,0 +1,14 @@
+{
+  "env": {
+    "TAGS": "@placeAnOrder"
+  },
+  "baseUrl": "https://app.dev.servedup.green/the-hawks-nest-w12/10",
+  "testFiles": "**/*.feature",
+  "video": false,
+  "defaultCommandTimeout": 60000,
+  "chromeWebSecurity": false,
+  "modifyObstructiveCode": false,
+  "viewportWidth": 760,
+  "viewportHeight": 1024,
+  "runPlatform": "tablet"
+}

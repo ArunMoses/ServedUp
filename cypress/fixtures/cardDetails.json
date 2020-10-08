@@ -1,0 +1,17 @@
+{
+    "valid": {
+        "cardNumber": 4242424242424242,
+        "expiry": "04/24",
+        "cvc": 424
+    },
+    "invalid": {
+      "cardNumber": 4000000000000002,
+      "expiry": "04/24",
+      "cvc": 424
+    },
+    "expired": {
+      "cardNumber": 4000000000000069,
+      "expiry": "04/24",
+      "cvc": 424
+    }
+  }
