@@ -8,6 +8,7 @@ import {
 } from "../../locators/menu";
 import {
   modalOverlay,
+  selectSize,
   increaseQuantity,
   quantity,
   addToOrder,
@@ -78,9 +79,7 @@ And("I select a bevarage from the menu", () => {
             return beverageCost.text().split("£")[1];
           })
           .as("selectedBeverageCost");
-        cy.get(selectBeverage(beverageType))
-          .wait(1000)
-          .click();
+        cy.wait(2000).get(selectBeverage(beverageType)).click({ force: true });
       }
       if (index > 1) {
         cy.get(selectBeverage(beverageType))
@@ -96,28 +95,29 @@ And("I select a bevarage from the menu", () => {
             return beverageCost.text().split("£")[1];
           })
           .as("selectedBeverageCost");
-        cy.get(selectBeverage(beverageType))
+        cy.wait(2000)
+          .get(selectBeverage(beverageType))
           .eq(index)
-          .wait(1000)
-          .click();
+          .click({ force: true });
       }
     });
   });
 });
 
 And("I select the quantity {int}", (selectQuantity) => {
-  cy.get(modalOverlay, { timeout: 5000 });
-  cy.document()
+  cy.wait(2000).get(modalOverlay, { timeout: 5000 });
+  cy.wait(2000)
+    .document()
     .then((doc) => {
       return doc.body;
     })
     .then(cy.wrap)
     .as("wrapper");
 
-  // cy.get('@selectedBeverageCost').then((cost)=>{
-  //   const $cost = Cypress.$(`p:contains('£${cost}')`)
-  //   cy.wrap($cost).click()
-  // })  
+  cy.get("@selectedBeverageCost").then((cost) => {
+    const $cost = Cypress.$(selectSize(`£${cost.trim().replace("from", "")}`));
+    cy.wrap($cost).click({ force: true });
+  });
 
   cy.get("@wrapper").find(increaseQuantity()).click();
   cy.get("@wrapper")
@@ -126,9 +126,11 @@ And("I select the quantity {int}", (selectQuantity) => {
       return quantity.text();
     })
     .as("selectedQuantity");
-  cy.get("@selectedQuantity").then((quantity) => {
-    expect(selectQuantity).to.equal(Number(quantity));
-  });
+  cy.get("@selectedQuantity")
+    .then((quantity) => {
+      expect(selectQuantity).to.equal(Number(quantity));
+    })
+    .wait(1000);
 });
 
 Then("The order total should be calculated for the selected quantity", () => {
@@ -142,8 +144,9 @@ Then("The order total should be calculated for the selected quantity", () => {
     cy.get("@selectedQuantity").then((selectedQuantity) => {
       cy.get("@orderTotal").then((orderTotal) => {
         const expectedOrderTotal =
-          Number(selectedBeverageCost) * Number(selectedQuantity);
-        // expect(Number(orderTotal)).to.equal(expectedOrderTotal)
+          Number(selectedBeverageCost.replace("from", "")) *
+          Number(selectedQuantity);
+        expect(Number(orderTotal)).to.equal(expectedOrderTotal);
       });
     });
   });
@@ -174,7 +177,7 @@ And("I click Continue to Checkout", () => {
     cy.get("@wrapper")
       .find(orderTitle())
       .then((title) => {
-        // expect(selectedBeverage).contains(title.text())
+        // expect(title.text()).contains(selectedBeverage)
       });
   });
 
@@ -183,7 +186,7 @@ And("I click Continue to Checkout", () => {
     cy.get("@wrapper")
       .find(orderTotal())
       .then((total) => {
-        // expect(calculatedOrderTotal).to.equal(total.text().split("£")[1])
+        expect(calculatedOrderTotal).to.equal(total.text().split("£")[1]);
       });
   });
   cy.get("@wrapper").find(continueToCheckout()).click();

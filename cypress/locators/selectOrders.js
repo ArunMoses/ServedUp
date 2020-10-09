@@ -3,7 +3,7 @@ exports.modalOverlay = () => {
 }
 
 exports.selectSize = (cost) => {
-    `//p[text()='${cost}']`
+    return `div.ReactModal__Overlay--after-open p:contains('${cost}'):nth-of-type(2)`
 }
 
 exports.increaseQuantity = () => {
