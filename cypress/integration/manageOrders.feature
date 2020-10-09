@@ -4,7 +4,7 @@ Feature: Manage orders
 @placeAnOrder
     Scenario: Place an order with valid card details
         Given I am on served up home page
-        And I select a bevarage from the menu
+        And I select an item from the menu
         And I select the quantity 2
         Then The order total should be calculated for the selected quantity
         And I click Add to order
@@ -19,7 +19,7 @@ Feature: Manage orders
 @placeAnOrder
     Scenario: Place an order with invalid card details
         Given I am on served up home page
-        And I select a bevarage from the menu
+        And I select an item from the menu
         And I select the quantity 2
         Then The order total should be calculated for the selected quantity
         And I click Add to order
@@ -34,7 +34,7 @@ Feature: Manage orders
 @placeAnOrder
     Scenario: Place an order with expired card details
         Given I am on served up home page
-        And I select a bevarage from the menu
+        And I select an item from the menu
         And I select the quantity 2
         Then The order total should be calculated for the selected quantity
         And I click Add to order
@@ -49,7 +49,7 @@ Feature: Manage orders
 @placeAnOrder
     Scenario: Place an order with card details with invalid cvc
         Given I am on served up home page
-        And I select a bevarage from the menu
+        And I select an item from the menu
         And I select the quantity 2
         Then The order total should be calculated for the selected quantity
         And I click Add to order

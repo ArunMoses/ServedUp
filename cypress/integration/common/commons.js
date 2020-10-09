@@ -1,9 +1,9 @@
 import "cypress-xpath";
 import { Given, Then, And } from "cypress-cucumber-preprocessor/steps";
 import {
-  beverageTypes,
-  selectBeverage,
-  beverageCost,
+  categories,
+  selectItem,
+  itemCost,
   reviewAndPay,
 } from "../../locators/menu";
 import {
@@ -25,30 +25,30 @@ Given("I am on served up home page", () => {
   cy.visit(Cypress.config().baseUrl);
 });
 
-And("I select a bevarage from the menu", () => {
-  const beverageIndex = (min, max) =>
+And("I select an item from the menu", () => {
+  const itemIndex = (min, max) =>
     Math.floor(Math.random() * (max - min) + min);
 
-  // get total beverage types in the menu
-  cy.get(beverageTypes)
+  // get total item types in the menu
+  cy.get(categories)
     .get("li")
     .its("length")
     .then((count) => {
       return count;
     })
-    .as("totalBeverageTypes");
+    .as("totalCategories");
 
-  // select a random beverage type in the menu
-  cy.get("@totalBeverageTypes").then((totalBeverageTypes) => {
-    const index = beverageIndex(1, totalBeverageTypes);
-    cy.get(beverageTypes)
+  // select a random item type in the menu
+  cy.get("@totalCategories").then((totalCategories) => {
+    const index = itemIndex(1, totalCategories);
+    cy.get(categories)
       .get("li")
       .eq(index)
       .then((option) => {
         return option.text();
       })
-      .as("beverageType");
-    cy.get(beverageTypes)
+      .as("category");
+    cy.get(categories)
       .get("li")
       .eq(index)
       .scrollIntoView()
@@ -56,47 +56,47 @@ And("I select a bevarage from the menu", () => {
       .wait(2000);
   });
 
-  // select a bevarage in the list
-  cy.get("@beverageType").then((beverageType) => {
-    cy.get(selectBeverage(beverageType))
+  // select a item in the list
+  cy.get("@category").then((category) => {
+    cy.get(selectItem(category))
       .its("length")
       .then((count) => {
         return count;
       })
-      .as("totalBeverages");
+      .as("totalItems");
 
-    cy.get("@totalBeverages").then((totalBeverages) => {
+    cy.get("@totalItems").then((totalItems) => {
       let index = 1;
-      if (totalBeverages > 1) index = beverageIndex(1, totalBeverages);
+      if (totalItems > 1) index = itemIndex(1, totalItems);
       if (index === 1) {
-        cy.get(selectBeverage(beverageType))
-          .then((beverage) => {
-            return beverage.text();
+        cy.get(selectItem(category))
+          .then((item) => {
+            return item.text();
           })
-          .as("selectedBeverage");
-        cy.get(beverageCost(beverageType))
-          .then((beverageCost) => {
-            return beverageCost.text().split("£")[1];
+          .as("selectedItem");
+        cy.get(itemCost(category))
+          .then((itemCost) => {
+            return itemCost.text().split("£")[1];
           })
-          .as("selectedBeverageCost");
-        cy.wait(2000).get(selectBeverage(beverageType)).click({ force: true });
+          .as("selectedItemCost");
+        cy.wait(2000).get(selectItem(category)).click({ force: true });
       }
       if (index > 1) {
-        cy.get(selectBeverage(beverageType))
+        cy.get(selectItem(category))
           .eq(index)
-          .then((beverage) => {
-            return beverage.text();
+          .then((item) => {
+            return item.text();
           })
-          .as("selectedBeverage");
+          .as("selectedItem");
 
-        cy.get(beverageCost(beverageType))
+        cy.get(itemCost(category))
           .eq(index)
-          .then((beverageCost) => {
-            return beverageCost.text().split("£")[1];
+          .then((itemCost) => {
+            return itemCost.text().split("£")[1];
           })
-          .as("selectedBeverageCost");
+          .as("selectedItemCost");
         cy.wait(2000)
-          .get(selectBeverage(beverageType))
+          .get(selectItem(category))
           .eq(index)
           .click({ force: true });
       }
@@ -114,7 +114,7 @@ And("I select the quantity {int}", (selectQuantity) => {
     .then(cy.wrap)
     .as("wrapper");
 
-  cy.get("@selectedBeverageCost").then((cost) => {
+  cy.get("@selectedItemCost").then((cost) => {
     const $cost = Cypress.$(selectSize(`£${cost.trim().replace("from", "")}`));
     cy.wrap($cost).click({ force: true });
   });
@@ -140,7 +140,7 @@ Then("The order total should be calculated for the selected quantity", () => {
       return innerText.text().split("£")[1].replace(")", "");
     })
     .as("orderTotal");
-  cy.get("@selectedBeverageCost").then((selectedBeverageCost) => {
+  cy.get("@selectedItemCost").then((selectedBeverageCost) => {
     cy.get("@selectedQuantity").then((selectedQuantity) => {
       cy.get("@orderTotal").then((orderTotal) => {
         const expectedOrderTotal =
@@ -173,7 +173,7 @@ And("I click Continue to Checkout", () => {
     });
 
   // assert order title
-  cy.get("@selectedBeverage").then((selectedBeverage) => {
+  cy.get("@selectedItem").then((selectedBeverage) => {
     cy.get("@wrapper")
       .find(orderTitle())
       .then((title) => {
