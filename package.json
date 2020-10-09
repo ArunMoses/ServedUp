@@ -22,6 +22,8 @@
     "nonGlobalStepDefinitions": true
   },
   "scripts": {
-    "test": "cypress open"
+    "test-desktop": "cypress run --browser chrome --config-file cypress-desktop.json",
+    "test-tablet": "cypress run --browser chrome --config-file cypress-tablet.json",
+    "test-mobile": "cypress run --browser chrome --config-file cypress-mobile.json"
   }
 }

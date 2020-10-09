@@ -6,10 +6,10 @@ exports.orderConfirmationName = (name) => {
     return `//p[text()='Name: ${name}']`
 }
 
-exports.orderConfirmationMobile = (number) => {
-    return `//p[text()='Phone: +44${number}']`
+exports.orderConfirmationMobile = () => {
+    return `//p[contains(text(),'Phone: ')]`
 }
 
 exports.orderConfirmationSubTotal = () => {
-    return "//p[text()='Subtotal:']/following::p"
+    return "p.sc-pNWxx.guEoZN"
 }

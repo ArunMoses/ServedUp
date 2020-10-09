@@ -1,3 +1,11 @@
+exports.modalOverlay = () => {
+    return '.ReactModal__Content--after-open'
+}
+
+exports.selectSize = (cost) => {
+    `//p[text()='${cost}']`
+}
+
 exports.increaseQuantity = () => {
     return 'button.sc-bkbjAj.dlagLn'
 }

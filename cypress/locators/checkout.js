@@ -1,3 +1,7 @@
+exports.cardPaymentiFrame = () => {
+    return "iframe[title='Secure card payment input frame']"
+}
+
 exports.cardNumber = () => {
     return "input[name='cardnumber']"
 }
@@ -7,6 +11,9 @@ exports.expiryDate = () => {
 }
 
 exports.cvc = () => {
-    return "input[name='CVC']"
+    return ".InputContainer input[name='cvc']"
 }
 
+exports.cardError = () => {
+    return "div.card-errors"
+}

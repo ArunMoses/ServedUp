@@ -1,6 +1,7 @@
 
 Feature: Manage orders
-    @placeAnOrder
+
+@placeAnOrder
     Scenario: Place an order with valid card details
         Given I am on served up home page
         And I select a bevarage from the menu
@@ -15,7 +16,7 @@ Feature: Manage orders
         When I click Pay By Card
         Then My payment should be successful
 
-    @placeAnOrder
+@placeAnOrder
     Scenario: Place an order with invalid card details
         Given I am on served up home page
         And I select a bevarage from the menu
@@ -27,10 +28,10 @@ Feature: Manage orders
         And I enter my name and phone number
         And I click Pay By Card
         And I enter invalid card details
-        When I click Pay By Card
-        Then My payment should be not be successful
+        And I click Pay By Card
+        Then I should see 'Your card was declined.' error 
 
-    @placeAnOrder
+@placeAnOrder
     Scenario: Place an order with expired card details
         Given I am on served up home page
         And I select a bevarage from the menu
@@ -43,4 +44,20 @@ Feature: Manage orders
         And I click Pay By Card
         And I enter expired card details
         When I click Pay By Card
-        Then My payment should be not be successful
+        Then I should see 'Your card has expired.' error 
+
+@placeAnOrder
+    Scenario: Place an order with card details with invalid cvc
+        Given I am on served up home page
+        And I select a bevarage from the menu
+        And I select the quantity 2
+        Then The order total should be calculated for the selected quantity
+        And I click Add to order
+        And I click Review and Pay
+        And I click Continue to Checkout
+        And I enter my name and phone number
+        And I click Pay By Card
+        And I enter card details with incorrect cvc
+        When I click Pay By Card
+        Then I should see 'Your card\'s security code is incorrect.' error 
+        
